@@ -15,7 +15,7 @@ class Env(tk.Tk):
         super(Env, self).__init__()
         self.action_space = ['u', 'd', 'l', 'r']
         self.n_actions = len(self.action_space)
-        self.title('Q Learning')
+        self.title('Grid World')
         self.geometry('{0}x{1}'.format(HEIGHT * UNIT, HEIGHT * UNIT))
         self.shapes = self.load_images()
         self.canvas = self._build_canvas()
