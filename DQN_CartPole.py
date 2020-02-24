@@ -93,7 +93,7 @@ class DQNAgnet:
         self.target_model.set_weights(self.behavior_model.get_weights())
 
 if __name__ == "__main__":
-    env = gym.make('CartPole-v0')
+    env = gym.make('MountainCar-v0')
     state_size = env.observation_space.shape[0]
     action_size = env.action_space.n
 
