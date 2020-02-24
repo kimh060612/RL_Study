@@ -85,7 +85,8 @@ class DQNAgent:
                 target[i][action[i]] = reward[i]
             else:
                 target[i][action[i]] = reward[i] + self.discount_rate * (np.amax(target_val[i]))
-
+        
+        print("Train_start")
         self.Behavior_model.fit(Nowstates, target,batch_size=self.BatchSize, epochs=1, verbose=0)
 
     def Target_model_Update(self):
