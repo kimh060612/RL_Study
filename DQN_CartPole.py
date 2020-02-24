@@ -62,7 +62,7 @@ class DQNAgnet:
             next_states[i] = mini_batch[i][3]
             dones.append(mini_batch[i][4])
 
-        target = self.behavior_model.predict(state)
+        target = self.behavior_model.predict(states)
         target_val = self.target_model.predict(next_states)
 
         for i in range(self.BatchSize):
