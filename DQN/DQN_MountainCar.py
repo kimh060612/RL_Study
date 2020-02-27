@@ -86,7 +86,6 @@ class DQNAgent:
             else:
                 target[i][action[i]] = reward[i] + self.discount_rate * (np.amax(target_val[i]))
         
-        print("Train_start")
         self.Behavior_model.fit(Nowstates, target,batch_size=self.BatchSize, epochs=1, verbose=0)
 
     def Target_model_Update(self):
@@ -118,8 +117,13 @@ if __name__ == "__main__":
             action = agent.DoPolicyAction(state)
             next_state, reward, done, _ = env.step(action)
             next_state = np.reshape(next_state, [1, state_size])
-            if next_state[0][0] >= 0.5:
+            
+            if next_state[0][0] >= 0.4:
                 reward = 5
+
+            if next_state[0][0] >= 0.5:
+                reward = 20
+
             agent.Save_replay_memory(state, action, reward, next_state, done)
 
             if (len(agent.Replay_memory)) > agent.Train_start_Replay_memery_size :
@@ -131,15 +135,14 @@ if __name__ == "__main__":
             if done:
 
                 agent.Target_model_Update()
+                score = score if score == 500 else score + 200
+
                 scores.append(score)
                 Episode.append(episode)
                 pylab.plot(Episode, scores, 'b')
                 pylab.savefig("D:\\RL_Study\\Model_save\\save_grpah\\MountainCar_dqn.png")
                 print("episode:", episode, "  score:", score, "  memory length:", len(agent.Replay_memory), "  epsilon:", agent.epsilon)
 
-                if np.mean(scores[-min(10, len(scores)):]) > 490:
-                    agent.Behavior_model.save_weights("D:\\RL_Study\\Model_save\\cartpole_dqn.h5")
+                if np.mean(scores[-min(30, len(scores)):]) > 90:
+                    agent.Behavior_model.save_weights("D:\\RL_Study\\Model_save\\Mountain_dqn.h5")
                     sys.exit()
-
-
-

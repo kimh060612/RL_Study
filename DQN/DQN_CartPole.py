@@ -16,7 +16,6 @@ class DQNAgnet:
     def __init__(self, StateNum, ActionNum, Load_need = False):
         self.size_state = StateNum
         self.size_action = ActionNum
-        self.learning_rate = 0.001
         self.replay_memory = deque(maxlen=2000)
 
         # hyper-parameter in DQN
@@ -25,19 +24,21 @@ class DQNAgnet:
         self.epsilon = 1.0
         self.epsilon_decay = 0.999
         self.epsilon_min = 0.01
-        self.BatchSize = 64
-        self.train_start = 1000
+        self.BatchSize = 200
+        self.train_start = 2000
 
         # Off-policy learning means that there are two policies (Behavior, target)
         self.behavior_model = self.NeuralNet_Model()
         self.target_model = self.NeuralNet_Model()
+
+        self.update_target_model()
 
         if Load_need:
             self.load_model("D:\\reinforcement-learning-kr\\2-cartpole\\1-dqn\\save_model\\cartpole_dqn_trained.h5")
 
 
     def DoAction(self, state): #Do Action following behavior policy
-        if (np.random.rand() < self.epsilon):
+        if (np.random.rand() <= self.epsilon):
             return random.randrange(self.size_action)
         else:
             Q_value = self.behavior_model.predict(state)
@@ -73,7 +74,7 @@ class DQNAgnet:
 
         self.behavior_model.fit(states, target, batch_size=self.BatchSize, epochs=1, verbose=0)
 
-    def NeuralNet_Model(self): #Neural Network Function Approximation
+    def NeuralNet_Model(self): # Neural Network Function Approximation
         model = Sequential()
         model.add(Dense(24, input_dim=self.size_state, activation='relu', kernel_initializer='he_uniform'))
         model.add(Dense(24, activation='relu', kernel_initializer='he_uniform'))
@@ -93,7 +94,7 @@ class DQNAgnet:
         self.target_model.set_weights(self.behavior_model.get_weights())
 
 if __name__ == "__main__":
-    env = gym.make('MountainCar-v0')
+    env = gym.make('CartPole-v1')
     state_size = env.observation_space.shape[0]
     action_size = env.action_space.n
 
@@ -111,7 +112,7 @@ if __name__ == "__main__":
             env.render()
 
             action = agent.DoAction(state)
-            next_state, reward, done, info = env.step(action) #Evironment gives 
+            next_state, reward, done, _ = env.step(action) #Evironment gives 
             next_state = np.reshape(next_state, [1, state_size])
             reward = reward if not done or score == 499 else -100
             agent.Memory_save(state, action, reward, next_state, done)
@@ -130,11 +131,9 @@ if __name__ == "__main__":
                 scores.append(score)
                 episodes.append(episode)
                 pylab.plot(episodes, scores, 'b')
-                pylab.savefig("D:\\reinforcement-learning-kr\\2-cartpole\\1-dqn\\save_graph\\cartpole_dqn.png")
+                pylab.savefig("D:\\RL_Study\\Model_save\\save_grpah\\cartpole_dqn.png")
                 print("episode:", episode, "  score:", score, "  memory length:", len(agent.replay_memory), "  epsilon:", agent.epsilon)
 
                 if np.mean(scores[-min(10, len(scores)):]) > 490:
                     agent.behavior_model.save_weights("D:\\RL_Study\\Model_save\\cartpole_dqn.h5")
                     sys.exit()
-
-
