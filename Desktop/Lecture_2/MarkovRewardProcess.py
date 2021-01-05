@@ -29,6 +29,7 @@ print(VMatrix, "\n")
 print("Reward :")
 print(Reward, "\n")
 
+# Iteration Method
 for k in range(1, K):
     VMatrix_pre = VMatrix
     PVMatrix = np.matmul(PMatrix, VMatrix)
@@ -41,5 +42,8 @@ for k in range(1, K):
 
 print(VMatrix)
 
+# Analytic Method
 PVInverse = np.linalg.inv(Identity - D_F * PMatrix)
 print (np.matmul(PVInverse, Reward))
+
+# See Two of them converges each other
