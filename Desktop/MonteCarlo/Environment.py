@@ -12,9 +12,33 @@ class ENV:
         
     def get_state(self, state, action):
         
-        pass
+        x, y = state
+        
+        y += self.action_set[action][0]
+        x += self.action_set[action][1]
 
-    def get_action(self):
-        pass
+        if x < 0 :
+            x = 0
+        elif x > (self.width - 1) :
+            x = (self.width - 1)
 
+        if y < 0 :
+            y = 0
+        elif y > (self.height - 1) :
+            y = (self.height - 1)
+        
+        return [x, y], self.Env[y][x]
+
+class MC_agent:
+    def __init__(self):
+        self.action_grid = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        self.action_text= ['U', 'D', 'L', 'R']
+        self.grid_width = 5
+        self.grid_height = self.grid_width
+        self.value_table = np.zeros((self.grid_width, self.grid_height))
+        self.e = .1
+        self.learning_rate = .01
+        self.discount_factor = .95
+        self.memory=[]
+    
     
