@@ -60,6 +60,6 @@ if __name__ == "__main__":
                 break
     env.close() 
 
-    print("-------------Policy-----------------")
+    print("-------------Policy----------------")
     print(agent.policy.reshape(4, 4))
     print(agent.QFunction)
