@@ -11,7 +11,7 @@ class MCAgent:
         self.state_count = np.zeros(ObserveSpace)
         self.memory_state = [] # store (state, reward) tuple
         self.memory_reward = []
-        self.G = np.zeros(ObserveSpace)
+        self.G = 0
         self.Discount = GAMMA
     
     def update(self):
