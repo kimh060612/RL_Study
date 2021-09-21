@@ -11,20 +11,19 @@ class MCAgent:
         self.state_count = np.zeros(ObserveSpace)
         self.memory_state = [] # store (state, reward) tuple
         self.memory_reward = []
-        self.G = 0
         self.Discount = GAMMA
     
     def update(self):
         self.memory_state.reverse()
         self.memory_reward.reverse()
-
-        for t in range(len(self.memory_state)):
+        G = self.memory_reward[0]
+        for t in range(1, len(self.memory_state)):
             s = self.memory_state[t]
             prev = self.memory_state[t + 1:]
+            G = self.Discount * G + self.memory_reward[t]
             if not s in prev:
-                self.G = self.Discount * self.G + self.memory_reward[t]
                 self.state_count[s] += 1
-                self.ValueFunction[s] = self.ValueFunction[s] + (1 / self.state_count[s]) * (self.G - self.ValueFunction[s])
+                self.ValueFunction[s] = self.ValueFunction[s] + (1 / self.state_count[s]) * (G - self.ValueFunction[s])
 
     def memorize(self, observation, reward):
         self.memory_state.append(observation)
@@ -33,7 +32,6 @@ class MCAgent:
     def initialize(self):
         self.memory_reward = []
         self.memory_state = []
-        self.G = 0 
 
 if __name__ == "__main__":
     
