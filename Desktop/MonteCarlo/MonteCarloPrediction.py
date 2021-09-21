@@ -1,6 +1,5 @@
 import gym
 import numpy as np
-import random
 
 GAMMA=0.9
 EPISODES=1000
