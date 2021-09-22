@@ -16,12 +16,11 @@ class MCAgent:
     def update(self):
         self.memory_state.reverse()
         self.memory_reward.reverse()
-        G = self.memory_reward[0]
-        for t in range(1, len(self.memory_state)):
+        G = 0
+        for t in range(len(self.memory_state)):
             s = self.memory_state[t]
-            prev = self.memory_state[t + 1:]
             G = self.Discount * G + self.memory_reward[t]
-            if not s in prev:
+            if not s in self.memory_state[t + 1:]:
                 self.state_count[s] += 1
                 self.ValueFunction[s] = self.ValueFunction[s] + (1 / self.state_count[s]) * (G - self.ValueFunction[s])
 

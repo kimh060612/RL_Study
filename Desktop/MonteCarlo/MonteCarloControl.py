@@ -17,9 +17,8 @@ class MCAgent:
     def update(self):
         self.memory_sa.reverse()
         self.memory_reward.reverse()
-        G = self.memory_reward[0]
-
-        for t in range(1, len(self.memory_sa)):
+        G = 0
+        for t in range(len(self.memory_sa)):
             s, a = self.memory_sa[t]
             prev = self.memory_sa[t + 1:]
             G = self.Discount * G + self.memory_reward[t]
