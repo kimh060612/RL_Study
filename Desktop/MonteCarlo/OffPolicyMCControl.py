@@ -2,8 +2,8 @@ import gym
 import numpy as np
 
 GAMMA=0.99
-EPISODES=500000
-TEST_EPISODE = 100
+EPISODES=100000
+TEST_EPISODE = 1000
 EPS = 0.1
 
 class MCAgent:
