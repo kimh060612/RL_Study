@@ -10,7 +10,7 @@ class MCAgent:
     def __init__(self, ObserveSpace, actionSpace):
         self.space = ObserveSpace
         self.action_space = actionSpace
-        self.QFunction = np.random.rand(ObserveSpace, actionSpace) * 100
+        self.QFunction = np.random.rand(ObserveSpace, actionSpace)
         self.state_count = np.zeros((ObserveSpace, actionSpace))
         self.memory_sa = [] # store (state, action) tuple
         self.memory_reward = []
