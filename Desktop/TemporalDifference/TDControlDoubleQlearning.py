@@ -2,7 +2,7 @@ import numpy as np
 import gym
 import matplotlib.pyplot as plt
 
-GAMMA=0.9
+GAMMA=0.99
 EPISODES=100000
 ALPHA = 0.1
 EPSILLON = 0.1
