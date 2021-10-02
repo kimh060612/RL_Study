@@ -11,7 +11,8 @@ class TDAgent:
     def __init__(self, observe_space, action_space):
         self.observe_space = observe_space
         self.action_space = action_space
-        self.QFunction = np.random.rand(self.observe_space, self.action_space)
+        self.Q1Function = np.random.rand(self.observe_space, self.action_space)
+        self.Q2Function = np.random.rand(self.observe_space, self.action_space)
         self.lr = ALPHA
         self.Discount = GAMMA
         self.EPS = EPSILLON
@@ -20,12 +21,15 @@ class TDAgent:
         if np.random.rand() < self.EPS:
             return np.random.randint(0, 4)
         else : 
-            return np.argmax(self.QFunction[state])
+            return np.argmax(self.Q1Function[state] + self.Q2Function[state])
 
     def update(self, state, action, reward, state_next):
-        a_ = np.argmax(self.QFunction[state_next])
-        self.QFunction[state, action] = self.QFunction[state, action] + self.lr * \
-                                            (reward + self.Discount * self.QFunction[state_next, a_] - self.QFunction[state, action])    
+        if np.random.rand() < 0.5 :
+            a_ = np.argmax(self.Q1Function[state_next])
+            self.Q1Function[state, action] += (reward + self.Discount * self.Q1Function[state_next, a_] - self.Q1Function[state, action])
+        else :
+            a_ = np.argmax(self.Q2Function[state_next])
+            self.Q2Function[state, action] += (reward + self.Discount * self.Q2Function[state_next, a_] - self.Q2Function[state, action])
 
 if __name__ == "__main__":
     env = gym.make('FrozenLake-v1')
@@ -67,4 +71,4 @@ if __name__ == "__main__":
     print(total_reward_test / TEST_EPISODE)
     env.close() 
     
-    print(np.argmax(agent.QFunction, axis=1).reshape(4, 4))
+    print(np.argmax(agent.Q1Function + agent.Q2Function, axis=1).reshape(4, 4))
