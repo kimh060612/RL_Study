@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 
-GAMMA=0.9
+GAMMA=0.99
 EPISODES=100000
 ALPHA = 0.1
 EPSILLON = 0.1
@@ -33,8 +33,7 @@ if __name__ == "__main__":
     total_reward_train = 0
 
     for epoch in range(EPISODES):
-        observation = env.reset()
-        state_ = 0
+        state_ = env.reset()
         
         for t in range(1000):
             env.render()
@@ -49,18 +48,17 @@ if __name__ == "__main__":
 
     total_reward_test = 0
     for i_episode in range(TEST_EPISODE):
-        observation = env.reset()
-        state_now = 0
+        state_now = env.reset()
 
         for t in range(1000):
             env.render()
-            action = agent.get_action(state=state_now)
+            action = np.argmax(agent.QFunction[state_now]) # agent.get_action(state=state_now)
             observation, reward, done, _ = env.step(action)
-            total_reward_test += reward
             state_now = observation
 
             if done:
                 print("Episode finished after {} timesteps".format(t+1))
+                total_reward_test += reward
                 break
     
     print(total_reward_train / EPISODES)

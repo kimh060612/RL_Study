@@ -26,11 +26,11 @@ class TDAgent:
 
     def update(self, state, action, reward, state_next):
         if np.random.rand() < 0.5 :
-            a_ = np.argmax(self.Q1Function[state_next])
-            self.Q1Function[state, action] += (reward + self.Discount * self.Q2Function[state_next, a_] - self.Q1Function[state, action])
-        else :
             a_ = np.argmax(self.Q2Function[state_next])
-            self.Q2Function[state, action] += (reward + self.Discount * self.Q1Function[state_next, a_] - self.Q2Function[state, action])
+            self.Q1Function[state, action] += self.lr * (reward + self.Discount * self.Q2Function[state_next, a_] - self.Q1Function[state, action])
+        else :
+            a_ = np.argmax(self.Q1Function[state_next])
+            self.Q2Function[state, action] += self.lr * (reward + self.Discount * self.Q1Function[state_next, a_] - self.Q2Function[state, action])
 
 if __name__ == "__main__":
     env = gym.make('FrozenLake-v1')
@@ -38,8 +38,7 @@ if __name__ == "__main__":
     train_reward_list = []
 
     for epoch in range(EPISODES):
-        observation = env.reset()
-        state_ = 0
+        state_ = env.reset()
         total_reward_train = 0
         t = 0
         while True:
@@ -48,27 +47,26 @@ if __name__ == "__main__":
             observation, reward, done, info = env.step(action)
             agent.update(state=state_, action=action, reward=reward, state_next=observation)
             state_ = observation
-            total_reward_train += reward
             t += 1
             if done:
                 print("Episode finished after {} timesteps".format(t+1))
+                total_reward_train += reward
                 break
         train_reward_list.append(total_reward_train)
     
     total_reward_test = 0
     for i_episode in range(TEST_EPISODE):
-        observation = env.reset()
-        state_now = 0
+        state_now = env.reset()
 
         for t in range(1000):
             env.render()
-            action = agent.get_action(state=state_now)
+            action = np.argmax(agent.Q1Function[state_now, :] + agent.Q2Function[state_now, :]) # agent.get_action(state=state_now)
             observation, reward, done, _ = env.step(action)
-            total_reward_test += reward
             state_now = observation
 
             if done:
                 print("Episode finished after {} timesteps".format(t+1))
+                total_reward_test += reward
                 break
     
     print(sum(train_reward_list) / EPISODES)

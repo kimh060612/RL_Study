@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 
-GAMMA=0.9
+GAMMA=0.99
 EPISODES=10000
 ALPHA = 0.5
 
