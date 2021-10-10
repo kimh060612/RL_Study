@@ -2,7 +2,7 @@ import numpy as np
 import gym
 
 GAMMA=0.99
-EPISODES=500000
+EPISODES=1000000
 ALPHA = 0.1
 
 class TDAgent:
