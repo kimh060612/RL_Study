@@ -75,4 +75,4 @@ if __name__ == "__main__":
     
     print(np.argmax(agent.Q1Function + agent.Q2Function, axis=1).reshape(4, 4))
     plt.plot(train_reward_list)
-    plt.show()
+    plt.show() # Print
