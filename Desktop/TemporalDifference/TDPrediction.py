@@ -2,8 +2,8 @@ import numpy as np
 import gym
 
 GAMMA=0.99
-EPISODES=10000
-ALPHA = 0.5
+EPISODES=500000
+ALPHA = 0.1
 
 class TDAgent:
     def __init__(self, observe_space, action_space):
@@ -26,12 +26,12 @@ if __name__ == "__main__":
     agent = TDAgent(16, 4)
 
     for epoch in range(EPISODES):
-        observation = env.reset()
-        state_ = 0
+        state_ = env.reset()
+
         for t in range(1000):
             env.render()
-            action = agent.get_action(state_)
-            observation, reward, done, info = env.step(action)
+            action = env.action_space.sample()
+            observation, reward, done, _ = env.step(action)
             agent.update(state=state_, state_next=observation, reward=reward)
             state_ = observation
 
