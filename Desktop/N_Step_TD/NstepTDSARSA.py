@@ -8,7 +8,7 @@ EPS = 0.1
 ALPHA = 0.1
 N = 3
 
-class MCAgent:
+class TDAgent:
     def __init__(self, ObserveSpace, actionSpace):
         self.space = ObserveSpace
         self.action_space = actionSpace
@@ -32,6 +32,7 @@ class MCAgent:
         if not done:
             G = G + pow(self.Discount, N) * self.QFunction[s_next][a_next]
         s, a = self.memory_sa[len(self.memory_sa) - N]
+        prev = self.QFunction[s][a]
         self.QFunction[s][a] = self.QFunction[s][a] + self.lr * (G - self.QFunction[s][a])   
 
     def memorize(self, observation, action, reward):
@@ -48,7 +49,7 @@ class MCAgent:
 if __name__ == "__main__":
     
     env = gym.make('FrozenLake-v1')
-    agent = MCAgent(16, 4)
+    agent = TDAgent(16, 4)
 
     total_reward_train = 0
     for i_episode in range(EPISODES):

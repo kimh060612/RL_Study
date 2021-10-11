@@ -8,7 +8,7 @@ EPS = 0.1
 ALPHA = 0.1
 N = 2
 
-class MCAgent:
+class TDAgent:
     def __init__(self, ObserveSpace, actionSpace):
         self.space = ObserveSpace
         self.action_space = actionSpace
@@ -50,7 +50,7 @@ class MCAgent:
 if __name__ == "__main__":
     
     env = gym.make('FrozenLake-v1')
-    agent = MCAgent(16, 4)
+    agent = TDAgent(16, 4)
 
     total_reward_train = 0
     for i_episode in range(EPISODES):
