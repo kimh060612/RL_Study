@@ -6,13 +6,13 @@ EPISODES=100000
 TEST_EPISODE = 1000
 EPS = 0.1
 ALPHA = 0.1
-N = 2
+N = 3
 
 class MCAgent:
     def __init__(self, ObserveSpace, actionSpace):
         self.space = ObserveSpace
         self.action_space = actionSpace
-        self.QFunction = np.random.rand(ObserveSpace, actionSpace)
+        self.QFunction = np.zeros((ObserveSpace, actionSpace))
         self.memory_sa = [] # store (state, action) tuple
         self.memory_reward = []
         self.Discount = GAMMA
@@ -27,13 +27,11 @@ class MCAgent:
 
     def update(self, s_next, a_next, done):
         G = 0
-
         for t in range(N):
             G = self.Discount * G + self.memory_reward[len(self.memory_reward) - 1 - t]
-        
         if not done:
-            G += pow(self.Discount, N) * self.QFunction[s_next][a_next]
-        s, a = self.memory_sa[len(self.memory_sa) - 1 - N]
+            G = G + pow(self.Discount, N) * self.QFunction[s_next][a_next]
+        s, a = self.memory_sa[len(self.memory_sa) - N]
         self.QFunction[s][a] = self.QFunction[s][a] + self.lr * (G - self.QFunction[s][a])   
 
     def memorize(self, observation, action, reward):

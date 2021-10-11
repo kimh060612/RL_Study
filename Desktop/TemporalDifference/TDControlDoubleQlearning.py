@@ -12,8 +12,8 @@ class TDAgent:
     def __init__(self, observe_space, action_space):
         self.observe_space = observe_space
         self.action_space = action_space
-        self.Q1Function = np.random.rand(self.observe_space, self.action_space)
-        self.Q2Function = np.random.rand(self.observe_space, self.action_space)
+        self.Q1Function = np.zeros((self.observe_space, self.action_space))
+        self.Q2Function = np.zeros((self.observe_space, self.action_space))
         self.lr = ALPHA
         self.Discount = GAMMA
         self.EPS = EPSILLON

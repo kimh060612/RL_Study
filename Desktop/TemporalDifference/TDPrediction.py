@@ -8,7 +8,7 @@ ALPHA = 0.1
 class TDAgent:
     def __init__(self, observe_space, action_space):
         self.observe_space = observe_space
-        self.ValueFunction = np.random.rand(self.observe_space)
+        self.ValueFunction = np.zeros(self.observe_space)
         self.ValueFunction[self.observe_space - 1] = 0
         self.policy = np.random.randint(0, action_space, self.observe_space)
         self.lr = ALPHA
