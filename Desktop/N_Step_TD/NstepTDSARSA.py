@@ -6,6 +6,7 @@ EPISODES=100000
 TEST_EPISODE = 1000
 EPS = 0.1
 ALPHA = 0.1
+N = 2
 
 class MCAgent:
     def __init__(self, ObserveSpace, actionSpace):
@@ -14,7 +15,6 @@ class MCAgent:
         self.QFunction = np.random.rand(ObserveSpace, actionSpace)
         self.memory_sa = [] # store (state, action) tuple
         self.memory_reward = []
-        self.policy = np.random.randint(0, 4, size=(ObserveSpace, ))
         self.Discount = GAMMA
         self.eps = EPS
         self.lr = ALPHA
@@ -25,20 +25,24 @@ class MCAgent:
         else :
             return np.argmax(self.QFunction[state])
 
-    def update(self):
+    def update(self, s_next, a_next, done):
         G = 0
 
-        for t in range(len(self.memory_sa)):
-            s, a = self.memory_sa[t]
-            G = self.Discount * G + self.memory_reward[t]
-
+        for t in range(N):
+            G = self.Discount * G + self.memory_reward[len(self.memory_reward) - 1 - t]
+        
+        if not done:
+            G += pow(self.Discount, N) * self.QFunction[s_next][a_next]
+        s, a = self.memory_sa[len(self.memory_sa) - 1 - N]
         self.QFunction[s][a] = self.QFunction[s][a] + self.lr * (G - self.QFunction[s][a])   
-        self.policy[s] = np.argmax(self.QFunction[s])
 
     def memorize(self, observation, action, reward):
         self.memory_sa.append((observation, action))
         self.memory_reward.append(reward)
     
+    def memory_length(self):
+        return len(self.memory_reward)
+
     def initialize(self):
         self.memory_reward = []
         self.memory_sa = []
@@ -47,45 +51,51 @@ if __name__ == "__main__":
     
     env = gym.make('FrozenLake-v1')
     agent = MCAgent(16, 4)
+
     total_reward_train = 0
     for i_episode in range(EPISODES):
-        observation = env.reset()
+        state_now = env.reset()
         agent.initialize()
-        state_now = 0
-
+        T = 987654321
+        action = agent.get_action(state=state_now)
         for t in range(1000):
             env.render()
-            action = agent.get_action(state=state_now)
             observation, reward, done, _ = env.step(action)
-            agent.memorize(observation=state_now, action=action, reward=reward)
-            state_now = observation
+            
+            if done:
+                T = t + 1
+            else :
+                action_next = agent.get_action(observation)
 
+            agent.memorize(observation=state_now, action=action, reward=reward)
+            if t - N + 1 >= 0:
+                agent.update(observation, action_next, done)
+
+            state_now = observation
+            action = action_next
+            
             if done:
                 print("Episode finished after {} timesteps".format(t+1))
-                agent.update()
                 total_reward_train += reward
                 break
     
     total_reward_test = 0
     for i_episode in range(TEST_EPISODE):
-        observation = env.reset()
-        state_now = 0
+        state_now = env.reset()
 
         for t in range(1000):
             env.render()
-            action = agent.get_action(state=state_now)
+            action = np.argmax(agent.QFunction[state_now]) # agent.get_action(state=state_now)
             observation, reward, done, _ = env.step(action)
-            total_reward_test += reward
             state_now = observation
 
             if done:
                 print("Episode finished after {} timesteps".format(t+1))
+                total_reward_test += reward
                 break
     
     print(total_reward_train / EPISODES)
     print(total_reward_test / TEST_EPISODE)
     env.close() 
 
-    print("-------------Policy-----------------")
-    print(agent.policy.reshape(4, 4))
     print(np.argmax(agent.QFunction, axis=1).reshape(4, 4))

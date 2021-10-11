@@ -4,24 +4,25 @@ import numpy as np
 GAMMA=0.99
 ALPHA = 0.1
 EPISODES=100000
-N = 5
+N = 2
 
 class TDAgent:
     def __init__(self, ObserveSpace):
         self.space = ObserveSpace
-        self.ValueFunction = np.zeros(ObserveSpace)
+        self.ValueFunction = np.random.rand(ObserveSpace)
         self.memory_state = [] # store (state, reward) tuple
         self.memory_reward = []
         self.Discount = GAMMA
         self.lr = ALPHA
     
-    def update(self):
+    def update(self, done):
         if self.memory_length() == 0:
             return
         G = 0
         for t in range(N):
             G = self.Discount * G + self.memory_reward[self.memory_length() - 1 - t]
-        G += pow(self.Discount, N) * self.ValueFunction[self.memory_state[self.memory_length() - 1]]
+        if not done:
+            G += pow(self.Discount, N) * self.ValueFunction[self.memory_state[self.memory_length() - 1]]
         s_ = self.memory_state[self.memory_length() - N - 1]
         self.ValueFunction[s_] = self.ValueFunction[s_] + self.lr * (G - self.ValueFunction[s_])
 
@@ -52,7 +53,7 @@ if __name__ == "__main__":
             agent.memorize(observation=observation, reward=reward)
             
             if t - N + 1 >= 0:
-                agent.update()
+                agent.update(done)
 
             if done:
                 print("Episode finished after {} timesteps".format(t+1))    
