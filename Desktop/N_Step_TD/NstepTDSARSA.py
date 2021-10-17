@@ -32,8 +32,7 @@ class TDAgent:
         if not done:
             G = G + pow(self.Discount, N) * self.QFunction[s_next][a_next]
         s, a = self.memory_sa[len(self.memory_sa) - N]
-        prev = self.QFunction[s][a]
-        self.QFunction[s][a] = self.QFunction[s][a] + self.lr * (G - self.QFunction[s][a])   
+        self.QFunction[s][a] = self.QFunction[s][a] + self.lr * (G - self.QFunction[s][a])
 
     def memorize(self, observation, action, reward):
         self.memory_sa.append((observation, action))

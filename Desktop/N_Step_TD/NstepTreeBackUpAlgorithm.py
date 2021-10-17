@@ -12,7 +12,7 @@ class TDAgent:
     def __init__(self, ObserveSpace, actionSpace):
         self.space = ObserveSpace
         self.action_space = actionSpace
-        self.QFunction = np.random.rand(ObserveSpace, actionSpace)
+        self.QFunction = np.zeros((ObserveSpace, actionSpace))
         self.memory_sa = [] # store (state, action) tuple
         self.memory_reward = []
         self.Discount = GAMMA
@@ -20,19 +20,23 @@ class TDAgent:
         self.lr = ALPHA
     
     def get_action(self, state):
-        if np.random.rand() < self.eps:
-            return np.random.randint(0, self.action_space)
-        else :
-            return np.argmax(self.QFunction[state])
+        return np.argmax(self.QFunction[state])
 
     def update(self, s_next, a_next, done):
         G = 0
 
+        if done :
+            G = self.memory_reward[len(self.memory_reward) - 1]
+
+        else :
+            G = self.memory_reward[len(self.memory_reward) - 1] + self.Discount * np.max(self.QFunction[s_next])
+
         for t in range(N):
-            G = self.Discount * G + self.memory_reward[len(self.memory_reward) - 1 - t]
-        
-        if not done:
-            G += pow(self.Discount, N) * self.QFunction[s_next][a_next]
+            k = len(self.memory_reward) - N + t
+            s_, a_ = self.memory_sa[k]
+            pi = 1 if a_ == np.argmax(self.QFunction[s_]) else 0
+            G = self.memory_reward[k] + self.Discount * pi * self.QFunction[s_][a_] + self.Discount * pi * G
+
         s, a = self.memory_sa[len(self.memory_sa) - 1 - N]
         self.QFunction[s][a] = self.QFunction[s][a] + self.lr * (G - self.QFunction[s][a])   
 
@@ -57,7 +61,7 @@ if __name__ == "__main__":
         state_now = env.reset()
         agent.initialize()
         T = 987654321
-        action = agent.get_action(state=state_now)
+        action = env.action_space.sample()
         for t in range(1000):
             env.render()
             observation, reward, done, _ = env.step(action)
@@ -65,7 +69,7 @@ if __name__ == "__main__":
             if done:
                 T = t + 1
             else :
-                action_next = agent.get_action(observation)
+                action_next = env.action_space.sample()
 
             agent.memorize(observation=state_now, action=action, reward=reward)
             if t - N + 1 >= 0:
