@@ -96,4 +96,4 @@ if __name__ == "__main__":
     print(total_reward_test / TEST_EPISODE)
     env.close() 
 
-    print(np.argmax(agent.QFunction, axis=1).reshape(4, 4))
+    print(np.argmax(agent.QFunction, axis=1).reshape(4, 4)) #
