@@ -79,4 +79,4 @@ if __name__ == "__main__":
     print("-------------Value Function-----------------")
     X_matrix = [ np.transpose(polynomial(s_, agent.Constant)) for s_ in range(16) ]
     X_matrix = np.array(X_matrix).T
-    print(np.matmul(agent.weight, X_matrix).reshape(4, 4))
+    print(np.matmul(agent.weight, X_matrix).reshape(4, 4)) # .
