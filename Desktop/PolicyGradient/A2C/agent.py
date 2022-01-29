@@ -1,6 +1,7 @@
 from os import stat
 import numpy as np
 import tensorflow as tf
+import tensorflow_probability as tfp
 from Actor import Actor
 from Critic import Critic
 
@@ -16,23 +17,26 @@ class agent:
         self.discount = discount
 
     def get_action(self, state):
-        state = tf.constant(np.expand_dims(state, axis=0))
+        state = np.expand_dims(state, axis=0)
         action_prob = self.actor(state)
-        action = tf.argmax(action_prob[0], 0).numpy()
-        return action
+        action_prob = action_prob.numpy()
+        dist = tfp.distributions.Categorical(probs=action_prob, dtype=tf.float32)
+        action = dist.sample()
+        return int(action.numpy()[0])
 
-    def update(self):
+    def update(self, done):
         for t in range(len(self.replay_batch)):
             s, a, r, n_s = self.replay_batch[t]
             state = np.array([s])
             next_state = np.array([n_s])
             with tf.GradientTape() as tape1, tf.GradientTape() as tape2:
-                prob = self.actor(state)
-                value = self.critic(state)
-                value_next = self.critic(next_state)
-                temp_error = r + self.discount * value_next - value
-                actor_loss = -1 * tf.math.log(prob[0, a]) * temp_error
-                critic_loss = temp_error * temp_error
+                prob = self.actor(state, training=True)
+                value = self.critic(state, training=True)
+                value_next = self.critic(next_state, training=True)
+                advantage = r +  (1 - (1 if done else 0)) * (self.discount * value_next - value)
+                dist = tfp.distributions.Categorical(probs=prob, dtype=tf.float32)
+                actor_loss = -1 * dist.log_prob(a) * advantage
+                critic_loss = advantage ** 2
             grad_actor = tape1.gradient(actor_loss, self.actor.trainable_variables)
             grad_critic = tape2.gradient(critic_loss, self.critic.trainable_variables)
             self.actor_optimizer.apply_gradients(zip(grad_actor, self.actor.trainable_variables))
@@ -40,7 +44,7 @@ class agent:
         self.replay_batch = []
         return actor_loss, critic_loss
 
-    def save_batch(self, state, action, reward, n_state):
+    def save_batch(self, state, action, reward, n_state, done):
         self.replay_batch.append((state, action, reward, n_state))
         if len(self.replay_batch) >= self.num_batch:
-            self.update()
+            self.update(done=done)
